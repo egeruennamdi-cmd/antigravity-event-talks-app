@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnRetry: document.getElementById('btn-retry'),
         btnRefresh: document.getElementById('btn-refresh'),
         btnExportCSV: document.getElementById('btn-export-csv'),
+        btnThemeToggle: document.getElementById('btn-theme-toggle'),
         syncStatus: document.getElementById('sync-status'),
         searchInput: document.getElementById('search-input'),
         searchClear: document.getElementById('search-clear'),
@@ -388,6 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.btnRefresh.addEventListener('click', fetchReleaseNotes);
     elements.btnRetry.addEventListener('click', fetchReleaseNotes);
     elements.btnExportCSV.addEventListener('click', exportToCSV);
+    elements.btnThemeToggle.addEventListener('click', toggleTheme);
 
     // Search input handler
     elements.searchInput.addEventListener('input', (e) => {
@@ -587,6 +589,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
 
         showToast(`Exported ${filtered.length} updates to CSV successfully!`, 'success');
+    }
+
+    /**
+     * Swap application color theme between Dark and Light mode
+     */
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        showToast(`Switched to ${isLight ? 'Light' : 'Dark'} Mode`, 'success');
+    }
+
+    // Initialize Theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
     }
 
     // Initialize application loading

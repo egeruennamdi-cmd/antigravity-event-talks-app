@@ -31,6 +31,12 @@
     --color-notice: #f59e0b;
     --color-notice-bg: rgba(245, 158, 11, 0.1);
 
+    /* Modal & Sharing UI variables */
+    --bg-modal: #0f172a;
+    --bg-modal-footer: rgba(3, 7, 18, 0.2);
+    --bg-tweet-preview: rgba(3, 7, 18, 0.4);
+    --ring-bg: #1F2937;
+
     /* Typography */
     --font-heading: 'Outfit', sans-serif;
     --font-body: 'Inter', sans-serif;
@@ -761,15 +767,15 @@ input, textarea {
 }
 
 .modal-box {
-    background: #0f172a;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-modal);
+    border: 1px solid var(--border-color);
     border-radius: 24px;
     width: calc(100% - 2rem);
     max-width: 550px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
     overflow: hidden;
     transform: translateY(20px) scale(0.95);
-    transition: transform var(--anim-medium);
+    transition: transform var(--anim-medium), background var(--anim-medium);
 }
 
 .modal-overlay.active .modal-box {
@@ -815,7 +821,7 @@ input, textarea {
 
 /* X/Twitter Post Card Mockup */
 .tweet-preview-container {
-    background: rgba(3, 7, 18, 0.4);
+    background: var(--bg-tweet-preview);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 1.25rem;
@@ -896,6 +902,7 @@ input, textarea {
 
 .progress-ring-bg {
     stroke-linecap: round;
+    stroke: var(--ring-bg) !important;
 }
 
 #progress-ring-bar {
@@ -909,7 +916,7 @@ input, textarea {
     justify-content: flex-end;
     gap: 0.75rem;
     padding: 1.25rem 1.5rem;
-    background: rgba(3, 7, 18, 0.2);
+    background: var(--bg-modal-footer);
     border-top: 1px solid var(--border-color);
 }
 
@@ -1008,4 +1015,61 @@ input, textarea {
         opacity: 0;
         transform: translateY(-20px) scale(0.9);
     }
+}
+
+/* ==========================================
+   Light Mode Custom Theme Overrides
+   ========================================== */
+body.light-theme {
+    --bg-dark: #f1f5f9;
+    --bg-surface: rgba(255, 255, 255, 0.65);
+    --bg-card: rgba(255, 255, 255, 0.55);
+    --border-color: rgba(15, 23, 42, 0.08);
+    --border-active: rgba(99, 102, 241, 0.5);
+    
+    --gradient-glow: radial-gradient(circle at top, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+    --gradient-card-glow: linear-gradient(135deg, rgba(56, 189, 248, 0.05) 0%, rgba(129, 140, 248, 0.03) 100%);
+
+    --color-text-main: #0f172a;
+    --color-text-muted: #475569;
+    --color-text-dim: #64748b;
+    --primary-blue: #0284c7;
+    --primary-indigo: #4f46e5;
+    
+    --bg-modal: #ffffff;
+    --bg-modal-footer: rgba(15, 23, 42, 0.03);
+    --bg-tweet-preview: rgba(15, 23, 42, 0.03);
+    --ring-bg: #e2e8f0;
+}
+
+.btn-theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    color: var(--color-text-main);
+    transition: all var(--anim-fast);
+}
+
+.btn-theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.btn-theme-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Light / Dark Icon displays */
+body.light-theme .icon-sun {
+    display: none !important;
+}
+
+body.light-theme .icon-moon {
+    display: block !important;
 }
