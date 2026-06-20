@@ -202,6 +202,31 @@ input, textarea {
     animation: spin 1s linear infinite;
 }
 
+.btn-export-csv {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    color: var(--color-text-main);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.btn-export-csv:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary-indigo);
+    color: var(--color-text-main);
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+}
+
+.btn-export-csv:active {
+    transform: translateY(1px);
+}
+
 /* ==========================================
    Control Panel (Search & Tabs)
    ========================================== */
@@ -578,6 +603,38 @@ input, textarea {
     background: rgba(255, 255, 255, 0.08);
     color: var(--color-text-main);
     border-color: var(--primary-blue);
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-card-copy {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all var(--anim-fast);
+}
+
+.btn-card-copy:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-text-main);
+    border-color: var(--color-feature);
+}
+
+.btn-card-copy.copied {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-feature);
+    border-color: var(--color-feature);
 }
 
 .btn-card-details {

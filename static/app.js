@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         errorMessage: document.getElementById('error-message'),
         btnRetry: document.getElementById('btn-retry'),
         btnRefresh: document.getElementById('btn-refresh'),
+        btnExportCSV: document.getElementById('btn-export-csv'),
         syncStatus: document.getElementById('sync-status'),
         searchInput: document.getElementById('search-input'),
         searchClear: document.getElementById('search-clear'),
@@ -204,12 +205,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${item.contentHtml}
                 </div>
                 <div class="card-footer">
-                    <button class="btn-card-tweet" id="btn-tweet-${item.id}">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                        </svg>
-                        <span>Tweet</span>
-                    </button>
+                    <div class="card-actions">
+                        <button class="btn-card-tweet" id="btn-tweet-${item.id}">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                            <span>Tweet</span>
+                        </button>
+                        <button class="btn-card-copy" id="btn-copy-${item.id}">
+                            <svg class="icon-copy" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span class="btn-copy-text">Copy</span>
+                        </button>
+                    </div>
                     <a href="${item.link}" target="_blank" class="btn-card-details" rel="noopener noreferrer">Details</a>
                 </div>
             `;
@@ -225,8 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Card selection click event
             card.addEventListener('click', (e) => {
-                // Ignore clicks if click was on a button or detail link
-                if (e.target.closest('.btn-card-tweet') || e.target.closest('.btn-card-details')) {
+                // Ignore clicks if click was on a button, copy button, or detail link
+                if (e.target.closest('.btn-card-tweet') || e.target.closest('.btn-card-copy') || e.target.closest('.btn-card-details')) {
                     return;
                 }
                 toggleCardSelection(item.id);
@@ -236,6 +246,12 @@ document.addEventListener('DOMContentLoaded', () => {
             card.querySelector('.btn-card-tweet').addEventListener('click', (e) => {
                 e.stopPropagation();
                 openTweetComposer([item]);
+            });
+
+            // Single copy button event
+            card.querySelector('.btn-card-copy').addEventListener('click', (e) => {
+                e.stopPropagation();
+                copyToClipboard(item);
             });
 
             elements.notesGrid.appendChild(card);
@@ -371,6 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Refresh click action
     elements.btnRefresh.addEventListener('click', fetchReleaseNotes);
     elements.btnRetry.addEventListener('click', fetchReleaseNotes);
+    elements.btnExportCSV.addEventListener('click', exportToCSV);
 
     // Search input handler
     elements.searchInput.addEventListener('input', (e) => {
@@ -496,6 +513,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 toast.remove();
             }, 300);
         }, 3500);
+    }
+
+    /**
+     * Copy release note text content to system clipboard
+     */
+    function copyToClipboard(item) {
+        const text = `BigQuery Update (${item.date}) [${item.type.toUpperCase()}]: ${item.textSummary.replace(/\s+/g, ' ').trim()}\nRead more: ${item.link}`;
+        
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById(`btn-copy-${item.id}`);
+            if (btn) {
+                btn.classList.add('copied');
+                const textSpan = btn.querySelector('.btn-copy-text');
+                const originalHtml = btn.innerHTML;
+                
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span class="btn-copy-text">Copied!</span>
+                `;
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = originalHtml;
+                }, 2000);
+            }
+            showToast('Copied update to clipboard!', 'success');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            showToast('Failed to copy to clipboard', 'error');
+        });
+    }
+
+    /**
+     * Export currently filtered release notes to a CSV file download
+     */
+    function exportToCSV() {
+        const filtered = getFilteredUpdates();
+        if (filtered.length === 0) {
+            showToast('No updates available to export', 'error');
+            return;
+        }
+
+        // CSV Headers
+        const headers = ['Date', 'Type', 'Description Summary', 'Reference Link'];
+        
+        // Convert items to CSV rows
+        const rows = filtered.map(item => {
+            const cleanedText = item.textSummary.replace(/\s+/g, ' ').trim();
+            // Escape double quotes by doubling them
+            return [
+                item.date,
+                item.type.toUpperCase(),
+                cleanedText,
+                item.link
+            ].map(val => `"${val.replace(/"/g, '""')}"`).join(',');
+        });
+
+        // Combine headers and rows
+        const csvContent = [headers.join(','), ...rows].join('\n');
+
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `bigquery_release_notes_${new Date().toISOString().slice(0, 10)}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showToast(`Exported ${filtered.length} updates to CSV successfully!`, 'success');
     }
 
     // Initialize application loading
