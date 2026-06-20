@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A premium, state-of-the-art BigQuery Release Notes tracker with built-in Twitter/X sharing tools, search, and semantic classification.">
+    <title>BigQuery Release Hub</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" xmlns="http://www.w3.org/2005/svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" fill="url(#grad1)"/>
+                        <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#grad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#60A5FA" />
+                                <stop offset="100%" stop-color="#8B5CF6" />
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#3B82F6" />
+                                <stop offset="100%" stop-color="#7C3AED" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>BigQuery Release Hub</h1>
+                    <span class="brand-subtitle">Real-time Google Cloud Feed Tracker</span>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <span id="sync-status" class="sync-status">Checking for updates...</span>
+                <button id="btn-refresh" class="btn-refresh" aria-label="Refresh release notes">
+                    <svg class="icon-refresh" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="app-main">
+            <!-- Search and Filter Panel -->
+            <section class="control-panel" aria-label="Filters and Search">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search release notes (e.g. partition, query, cost)..." aria-label="Search release notes">
+                    <button id="search-clear" class="search-clear" aria-label="Clear search" style="display: none;">&times;</button>
+                </div>
+
+                <nav class="filter-tabs" aria-label="Filter by type">
+                    <button class="filter-tab active" data-filter="all" id="filter-all">All Updates</button>
+                    <button class="filter-tab" data-filter="feature" id="filter-feature">Features</button>
+                    <button class="filter-tab" data-filter="change" id="filter-change">Changes</button>
+                    <button class="filter-tab" data-filter="deprecation" id="filter-deprecation">Deprecations</button>
+                    <button class="filter-tab" data-filter="notice" id="filter-notice">Notices</button>
+                </nav>
+            </section>
+
+            <!-- Loading & Error States -->
+            <div id="loading-state" class="loading-state">
+                <div class="spinner"></div>
+                <p>Retrieving Google Cloud BigQuery Release Notes...</p>
+            </div>
+
+            <div id="error-state" class="error-state" style="display: none;">
+                <svg viewBox="0 0 24 24" width="48" height="48" stroke="#EF4444" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <h3>Failed to load release notes</h3>
+                <p id="error-message">Unknown error occurred while connecting to the backend feed.</p>
+                <button id="btn-retry" class="btn-retry">Try Again</button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <svg viewBox="0 0 24 24" width="48" height="48" stroke="#9CA3AF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <h3>No updates match your search</h3>
+                <p>Try refining your keyword query or choosing a different filter tab.</p>
+            </div>
+
+            <!-- Feed Content Grid -->
+            <section id="notes-grid" class="notes-grid" aria-label="Release Notes List" style="display: none;">
+                <!-- Dynamically populated by JavaScript -->
+            </section>
+        </main>
+
+        <!-- Floating Selection Bar (rises when updates are selected) -->
+        <div id="floating-bar" class="floating-bar">
+            <div class="floating-bar-content">
+                <div class="selection-info">
+                    <span class="selection-indicator">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                    </span>
+                    <span id="selection-count">1 update selected</span>
+                </div>
+                <div class="floating-bar-actions">
+                    <button id="btn-clear-selection" class="btn-secondary">Clear</button>
+                    <button id="btn-tweet-selected" class="btn-primary">
+                        <svg class="icon-x" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        <span>Tweet Selected</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tweet Composer Modal -->
+        <div id="tweet-modal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <div class="modal-title-group">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="x-logo">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        <h2>Compose Post</h2>
+                    </div>
+                    <button id="btn-close-modal" class="btn-close" aria-label="Close modal">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="tweet-preview-container">
+                        <div class="tweet-user-profile">
+                            <div class="user-avatar">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="#9CA3AF">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                            <div class="user-info">
+                                <span class="user-display-name">Cloud Architect</span>
+                                <span class="user-handle">@cloud_developer</span>
+                            </div>
+                        </div>
+                        
+                        <div class="tweet-textarea-wrapper">
+                            <textarea id="tweet-textarea" rows="5" placeholder="What's happening in BigQuery?"></textarea>
+                        </div>
+                        
+                        <div class="tweet-footer">
+                            <div class="char-counter-group">
+                                <svg class="progress-ring" width="24" height="24">
+                                    <circle class="progress-ring-bg" stroke="#1F2937" stroke-width="2" fill="transparent" r="10" cx="12" cy="12" />
+                                    <circle id="progress-ring-bar" stroke="#10B981" stroke-width="2.5" fill="transparent" r="10" cx="12" cy="12" />
+                                </svg>
+                                <span id="char-counter">0 / 280</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="btn-simulate-tweet" class="btn-secondary">Simulate Success</button>
+                    <button id="btn-post-tweet" class="btn-primary">
+                        <span>Post on X</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Toast System -->
+        <div id="toast-container" class="toast-container"></div>
+        
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>BigQuery Release Hub is an independent dashboard displaying official GCP updates from the RSS feed.</p>
+            <p class="copyright">&copy; 2026 Developer Platform. Designed with premium dark aesthetics.</p>
+        </footer>
+
+    </div>
+
+    <!-- JS Logic -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
