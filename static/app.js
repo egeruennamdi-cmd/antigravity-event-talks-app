@@ -455,9 +455,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mock Simulation action
     elements.btnSimulateTweet.addEventListener('click', () => {
-        elements.tweetModal.classList.remove('active');
-        clearSelection();
-        showToast('Post simulated successfully! 🚀 (Self-contained mockup)', 'success');
+        createConfettiBurst(elements.btnSimulateTweet);
+        setTimeout(() => {
+            elements.tweetModal.classList.remove('active');
+            clearSelection();
+            showToast('Post simulated successfully! 🚀 (Self-contained mockup)', 'success');
+        }, 300);
     });
 
     // ==========================================
@@ -526,6 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.clipboard.writeText(text).then(() => {
             const btn = document.getElementById(`btn-copy-${item.id}`);
             if (btn) {
+                createConfettiBurst(btn);
                 btn.classList.add('copied');
                 const textSpan = btn.querySelector('.btn-copy-text');
                 const originalHtml = btn.innerHTML;
@@ -599,6 +603,55 @@ document.addEventListener('DOMContentLoaded', () => {
         const isLight = document.body.classList.contains('light-theme');
         localStorage.setItem('theme', isLight ? 'light' : 'dark');
         showToast(`Switched to ${isLight ? 'Light' : 'Dark'} Mode`, 'success');
+    }
+
+    /**
+     * Trigger a micro-confetti burst animation around an HTML element
+     */
+    function createConfettiBurst(element) {
+        const rect = element.getBoundingClientRect();
+        const container = document.body;
+        const particleCount = 20;
+        const colors = ['#10B981', '#38bdf8', '#818cf8', '#a855f7', '#fbbf24'];
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('span');
+            particle.className = 'confetti-particle';
+            
+            // Random properties
+            const size = Math.random() * 6 + 4;
+            const angle = Math.random() * 2 * Math.PI;
+            const velocity = Math.random() * 80 + 40;
+            const rotation = Math.random() * 360;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Position particle at the center of the element
+            const startX = rect.left + rect.width / 2 + window.scrollX;
+            const startY = rect.top + rect.height / 2 + window.scrollY;
+            
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.background = color;
+            particle.style.left = `${startX}px`;
+            particle.style.top = `${startY}px`;
+            particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            
+            container.appendChild(particle);
+            
+            // Animate via CSS-in-JS transitions
+            const destX = Math.cos(angle) * velocity;
+            const destY = Math.sin(angle) * velocity;
+            
+            const animation = particle.animate([
+                { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1 },
+                { transform: `translate(${destX}px, ${destY}px) scale(0) rotate(${rotation}deg)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 500 + 400,
+                easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+            });
+            
+            animation.onfinish = () => particle.remove();
+        }
     }
 
     // Initialize Theme

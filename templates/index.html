@@ -118,6 +118,15 @@
                 </svg>
                 <h3>Failed to load release notes</h3>
                 <p id="error-message">Unknown error occurred while connecting to the backend feed.</p>
+                <details class="error-details">
+                    <summary>View Diagnostic & Connection Details</summary>
+                    <div class="error-details-content">
+                        <p><strong>Endpoint:</strong> <code>/api/release-notes</code></p>
+                        <p><strong>Diagnosis:</strong> The Flask backend server might be stopped or unresponsive. Check your running tasks or command terminal.</p>
+                        <p>If the server is active, verify your internet connection below:</p>
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="link-diagnostic">Verify Local Connection Status</a>
+                    </div>
+                </details>
                 <button id="btn-retry" class="btn-retry">Try Again</button>
             </div>
 

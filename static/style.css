@@ -1073,3 +1073,72 @@ body.light-theme .icon-sun {
 body.light-theme .icon-moon {
     display: block !important;
 }
+
+/* ==========================================
+   Diagnostic & Confetti Particle Styling
+   ========================================== */
+.error-details {
+    margin-top: 1.25rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+    background: rgba(239, 68, 68, 0.03);
+    border: 1px solid rgba(239, 68, 68, 0.12);
+    border-radius: 12px;
+    padding: 0.9rem 1.25rem;
+    max-width: 450px;
+    width: 100%;
+    transition: all var(--anim-medium);
+}
+
+.error-details summary {
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-deprecation);
+    outline: none;
+    user-select: none;
+}
+
+.error-details summary:hover {
+    color: #fb7185;
+}
+
+.error-details-content {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+}
+
+.error-details-content p {
+    margin-bottom: 0.5rem;
+}
+
+.error-details-content code {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    padding: 0.1rem 0.35rem;
+    border-radius: 5px;
+    color: #f8fafc;
+    font-family: monospace;
+}
+
+.link-diagnostic {
+    display: inline-flex;
+    margin-top: 0.5rem;
+    color: var(--primary-blue);
+    text-decoration: underline;
+    font-weight: 600;
+    transition: color var(--anim-fast);
+}
+
+.link-diagnostic:hover {
+    color: var(--primary-indigo);
+}
+
+.confetti-particle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform, opacity;
+}
